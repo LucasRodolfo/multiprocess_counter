@@ -39,7 +39,7 @@ int main() {
 
   char temp;
   int vetor[200];
-  int i=0, tamanho=0, j=0;
+  int i=0, tamanho=0, j=0, posicao;
 
   pid_t filhos[4];
 
@@ -57,22 +57,31 @@ int main() {
   } while(temp != '\n');
   tamanho =i;
 
-  for (int i = 0; i < tamanho; i++) {
-    if (ehPrimo(vetor[i])) {
-      printf("%d é primo\n", vetor[i] );
-    }
-  }
+  // for (int i = 0; i < tamanho; i++) {
+  //   if (ehPrimo(vetor[i])) {
+  //     printf("%d é primo\n", vetor[i] );
+  //   }
+  // }
+  // printf("tamanho: %d\n",tamanho );
   for (i = 0; i < tamanho; i+=4) {
     /* Create the processes */
+
     for (j=0; j<4; j++) {
-        filhos[j] = fork();
-        if (filhos[j] == 0) {
-          (*NPrimos) += ehPrimo(vetor[i+j]);
-          exit(0);
-        }
-      for (int j=0; j<4; j++) {
-        waitpid(filhos[j], NULL, 0);
-      }
+          posicao = i+j;
+          //printf("passou do tamanho %d\n", posicao );
+          if (posicao >= tamanho) {
+            //printf("passou do tamanho total\n");
+            break;
+          }
+          filhos[j] = fork();
+          if (filhos[j] == 0) {
+              //printf("numero sendo testado: %d\n", vetor[posicao]);
+              (*NPrimos) += ehPrimo(vetor[i+j]);
+              exit(0);
+          }
+          for (int j=0; j<4; j++) {
+            waitpid(filhos[j], NULL, 0);
+          }
     }
   }
   printf("%d\n", *NPrimos);
