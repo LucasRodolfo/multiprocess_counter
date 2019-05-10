@@ -4,8 +4,7 @@
  * entrada. Ao receber um caractere fim de linha ('\n'), deve imprimir na tela o
  * numero de palavras separadas que recebeu e, apos, encerrar.
  */
-
-#include <stdio.h>
+//Lucas Rodolfo de Castro Moura - 156405
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -13,10 +12,10 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-int ehPrimo(int numero){
+int ehPrimo(long long int numero){            /*Funcao que analisa se um numero eh primo ou nao*/
       int flag = 0;
 
-      for(int i = 2; i <= numero/2; ++i){
+      for(long long int i = 2; i <= numero/2; ++i){
           if(numero%i == 0){
               flag = 1;
               break;
@@ -38,7 +37,7 @@ int ehPrimo(int numero){
 int main() {
 
   char temp;
-  int vetor[200];
+  long long int vetor[100];
   int i=0, tamanho=0, j=0, posicao;
 
   pid_t filhos[4];
@@ -46,37 +45,26 @@ int main() {
   int protection = PROT_READ | PROT_WRITE;
   int visibility = MAP_SHARED | MAP_ANON;
 
-  int *NPrimos; /* Numero de elementos que ja foram processados */
+  int *NPrimos;
   NPrimos = (int*) mmap(NULL, sizeof(int), protection, visibility, 0, 0);
   if (NPrimos==(int*)-1) printf("Erro de alocacao!\n");
   (*NPrimos) = 0;
 
-  do {
-    scanf("%d%c", &vetor[i], &temp);
+  do {                                    /*Esse loop lê string de entrada e armazena em um vetor de inteiros*/
+    scanf("%lld%c", &vetor[i], &temp);
     i++;
   } while(temp != '\n');
-  tamanho =i;
+  tamanho =i;                              /*Guarda o tamanho do vetor de inteiros criado*/
 
-  // for (int i = 0; i < tamanho; i++) {
-  //   if (ehPrimo(vetor[i])) {
-  //     printf("%d é primo\n", vetor[i] );
-  //   }
-  // }
-  // printf("tamanho: %d\n",tamanho );
-  for (i = 0; i < tamanho; i+=4) {
-    /* Create the processes */
-
+  for (i = 0; i < tamanho; i+=4) {         /*Esse loop passa pelos elementos do vetor de inteiros e cria um proceso filho para analisar cada numero desse vetor*/
     for (j=0; j<4; j++) {
-          posicao = i+j;
-          //printf("passou do tamanho %d\n", posicao );
-          if (posicao >= tamanho) {
-            //printf("passou do tamanho total\n");
+          posicao = i+j;                    /*Posicao do vetor de inteiros que vai ser analisada agora*/
+          if (posicao >= tamanho) {         /*Se todos os elementos ja foram analisados, para*/
             break;
           }
           filhos[j] = fork();
           if (filhos[j] == 0) {
-              //printf("numero sendo testado: %d\n", vetor[posicao]);
-              (*NPrimos) += ehPrimo(vetor[i+j]);
+              (*NPrimos) += ehPrimo(vetor[posicao]);
               exit(0);
           }
           for (int j=0; j<4; j++) {
